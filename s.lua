@@ -12,7 +12,6 @@ TriggerEvent('es:addGroupCommand', 'seuranta', "superadmin", function(source, ar
                     for _,v in ipairs(res) do
                         table.insert(syy, v['syy'])
                         amount = _
-                        print(_)
                     end
                     if amount >= 1 then
                         TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "\nNimi: "..xPlayer.name.."\nHex: "..xPlayer.identifier..'\nSyy: '..table.concat(syy, ", ")}})
