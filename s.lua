@@ -5,38 +5,27 @@ TriggerEvent('es:addGroupCommand', 'seuranta', "superadmin", function(source, ar
     if tonumber(args[1]) then
         if GetPlayerName(args[1]) then
             local syy = {}
+            local amount = 0
             local xPlayer = ESX.GetPlayerFromId(args[1])
             if xPlayer then
-                MySQL.Async.fetchScalar('SELECT COUNT(1) FROM seuranta WHERE hex = @hex', {['@hex'] = xPlayer.identifier }, function(c)
-                    if c > 0 then
-                        MySQL.Async.fetchAll('SELECT syy FROM seuranta WHERE hex = @hex', {['@hex'] = xPlayer.identifier }, function(res)
-                            for _,v in ipairs(res) do
-                                table.insert(syy, v['syy'])
-                            end
-                            TriggerEvent("es:getPlayers", function(pl)
-                                for k,v in pairs(pl) do
-                                    TriggerEvent("es:getPlayerFromId", k, function(user)
-                                        if(user.getPermissions() > 0)then
-                                            if c > 1 then
-                                                TriggerClientEvent('chatMessage', k, "SEURANTA", {255,0,0}, '\nNimi: '..xPlayer.name..'\nHex: '..xPlayer.identifier..'\nSyyt: '..table.concat(syy, ", "))
-                                            elseif c == 1 then
-                                                TriggerClientEvent('chatMessage', k, "SEURANTA", {255,0,0}, '\nNimi: '..xPlayer.name..'\nHex: '..xPlayer.identifier..'\nSyy: '..table.concat(syy, ", "))
-                                            end
-                                        end
-                                    end)
-                                end
-                            end)
-                        end)
+                MySQL.Async.fetchAll('SELECT syy FROM seuranta WHERE hex = @hex', {['@hex'] = xPlayer.identifier }, function(res)
+                    for _,v in ipairs(res) do
+                        table.insert(syy, v['syy'])
+                        amount = _
+                        print(_)
+                    end
+                    if amount >= 1 then
+                        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "\nNimi: "..xPlayer.name.."\nHex: "..xPlayer.identifier..'\nSyy: '..table.concat(syy, ", ")}})
                     else
-                        TriggerClientEvent('chatMessage', source, "SEURANTA", {255,0,0}, 'Pelaajalla ei ole seurattavien pelaajien listassa...')
+                        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Pelaajalla ei ole seurattavien pelaajien listassa..."}})
                     end
                 end)
             end
         else
-            TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Kyseinen pelaaja ei näyttäisi olevan palvelimella...")
+            TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Kyseinen pelaaja ei näyttäisi olevan palvelimella..."}})
         end
     else
-        TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Pelaajan ID täytyy olla numero...")
+        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Pelaajan ID täytyy olla numero..."}})
     end 
 end)
 
@@ -54,7 +43,7 @@ TriggerEvent('es:addGroupCommand', 'removeseuranta', "superadmin", function(sour
                         ['@syy'] = syy,
                         ['@submitter'] = sxPlayer.identifier,
                     }, function(aff)
-                        TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Poistettu "..aff.." rivi(ä) tietokannasta pelaajan "..txPlayer.name..' '..txPlayer.identifier)
+                        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Poistettu "..aff.." rivi(ä) tietokannasta pelaajan "..txPlayer.name..' '..txPlayer.identifier}})
                     end)
                 end
             end
@@ -76,19 +65,19 @@ TriggerEvent('es:addGroupCommand', 'addseuranta', "superadmin", function(source,
                             ['@syy'] = args[2],
                             ['@submitter'] = sxPlayer.identifier,
                         })
-                        TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Pelaajalle ["..args[1]..'] '..txPlayer.name..' lisätty seuranta syystä '.. args[2])
+                        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Pelaajalle ["..args[1]..'] '..txPlayer.name..' lisätty seuranta syystä '.. args[2]}})
                     else
-                        TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Et voi asettaa pelaajaa seurantaan ilman syytä..")
+                        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Et voi asettaa pelaajaa seurantaan ilman syytä.."}})
                     end
                 end
             else
-                TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Et voi asettaa pelaajaa seurantaan ilman syytä..")
+                TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Et voi asettaa pelaajaa seurantaan ilman syytä.."}})
             end
         else
-            TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Kyseinen pelaaja ei näyttäisi olevan palvelimella...")
+            TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Kyseinen pelaaja ei näyttäisi olevan palvelimella..."}})
         end
     else
-        TriggerClientEvent('chatMessage', source, "SEURANTA", {255, 0, 0}, "Pelaajan ID täytyy olla numero...")
+        TriggerClientEvent("chat:addMessage", source, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "Pelaajan ID täytyy olla numero..."}})
     end
 end)
 
@@ -96,28 +85,24 @@ AddEventHandler("playerConnecting", function(name, setReason, deferrals)
     local hex = GetPlayerIdentifier(source)
     local nimi = GetPlayerName(source)
     local syy = {}
-    if hex then
-        MySQL.Async.fetchScalar('SELECT COUNT(1) FROM seuranta WHERE hex = @hex', {['@hex'] = hex }, function(c)
-            if c > 0 then
-                MySQL.Async.fetchAll('SELECT syy FROM seuranta WHERE hex = @hex', {['@hex'] = hex }, function(res)
-                    for _,v in ipairs(res) do
-                        table.insert(syy, v['syy'])
-                    end
-                    TriggerEvent("es:getPlayers", function(pl)
-                        for k,v in pairs(pl) do
-                            TriggerEvent("es:getPlayerFromId", k, function(user)
-                                if(user.getPermissions() > 0)then
-                                    if c > 1 then
-                                        TriggerClientEvent('chatMessage', k, "SEURANTA", {255,0,0}, '\nNimi: '..nimi..'\nHex: '..hex..'\nSyyt: '..table.concat(syy, ", "))
-                                    elseif c == 1 then
-                                        TriggerClientEvent('chatMessage', k, "SEURANTA", {255,0,0}, '\nNimi: '..nimi..'\nHex: '..hex..'\nSyy: '..table.concat(syy, ", "))
-                                    end
-                                end
-                            end)
+    local amount = 0
+    if hex and nimi then
+        MySQL.Async.fetchAll('SELECT syy FROM seuranta WHERE hex = @hex', {['@hex'] = hex }, function(res)
+            for _,v in ipairs(res) do
+                table.insert(syy, v['syy'])
+                amount = _
+            end
+            TriggerEvent("es:getPlayers", function(pl)
+                for k,v in pairs(pl) do
+                    TriggerEvent("es:getPlayerFromId", k, function(user)
+                        if(user.getPermissions() > 0)then
+                            if amount >= 1 then
+                                TriggerClientEvent("chat:addMessage", k, {color = {255,0,0}, multiline = true, args = {"SEURANTA", "\nNimi: "..xPlayer.name.."\nHex: "..xPlayer.identifier..'\nSyy: '..table.concat(syy, ", ")}})
+                            end
                         end
                     end)
-                end)
-            end
+                end
+            end)
         end)
     end
 end)
