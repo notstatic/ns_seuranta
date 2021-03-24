@@ -1,5 +1,5 @@
 ESX = nil
-TriggerEvent('esx:getShared0bject', function(obj) ESX = obj end)
+TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 TriggerEvent('es:addGroupCommand', 'seuranta', "superadmin", function(source, args, user)
     if tonumber(args[1]) then
