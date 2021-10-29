@@ -9,7 +9,7 @@ TriggerEvent('es:addGroupCommand', 'lookup', "superadmin", function(source, args
             local reason = {}
             local xPlayer = ESX.GetPlayerFromId(args[1])
             if xPlayer then
-                MySQL.Async.fetchAll('SELECT syy FROM seuranta WHERE hex = @hex', {['@hex'] = xPlayer.identifier }, function(result)
+                MySQL.Async.fetchAll('SELECT reason FROM player_tracking WHERE hex = @hex', {['@hex'] = xPlayer.identifier }, function(result)
                     if result then
                         for index,res in ipairs(result) do
                             table.insert(reason, res("reason"))
@@ -33,7 +33,7 @@ TriggerEvent('es:addGroupCommand', 'removetracking', "superadmin", function(sour
         if GetPlayerName(args[1]) then -- Valid player
             xPlayer = ESX.GetPlayerFromId(args[1])
             if xPlayer then
-                MySQL.Async.execute('DELETE FROM seuranta WHERE hex = @hex',
+                MySQL.Async.execute('DELETE FROM player_tracking WHERE hex = @hex',
                 {
                     ['@hex'] = xPlayer.identifier
                 }, function(aff)
